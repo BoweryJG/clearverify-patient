@@ -56,15 +56,20 @@
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  Patient Phone  │────▶│  AI Portal      │────▶│  Magic Link     │
-│  (QR/Home)      │     │  Learner        │     │  Authentication │
+│  Patient Phone  │────▶│   React App     │────▶│  Backend API    │
+│  (QR/Home)      │     │   (Frontend)    │     │  (Node.js)      │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
-                                │
-┌─────────────────┐     ┌───────▼────────┐     ┌─────────────────┐
-│  Practice       │◄────│  ClearVerify   │────▶│  Insurance      │
-│  Dashboard      │     │  Intelligence  │     │  Portal Network │
-└─────────────────┘     └────────────────┘     └─────────────────┘
+                                                          │
+                        ┌─────────────────┐     ┌─────────▼────────┐
+                        │  Insurance      │◄────│  AI Portal       │
+                        │  Portal Network │     │  Automation      │
+                        └─────────────────┘     └──────────────────┘
 ```
+
+### **Architecture Separation**
+- **Frontend (React)** - Patient-facing web app, runs in browser
+- **Backend API (Node.js)** - Handles automation, runs Puppeteer
+- **Clean separation** - No Node.js dependencies in frontend build
 
 ### **🤖 AI-Powered Components**
 
@@ -89,7 +94,8 @@
 - **Session Management** - Secure credential handling
 
 ### **Backend Integration**
-- **Node.js + Express** - API server (separate repo)
+- **Node.js + Express** - API server ([clearverify-api](https://github.com/BoweryJG/clearverify-api))
+- **Puppeteer** - Browser automation (runs on backend only)
 - **Magic Link APIs** - Email/SMS delivery
 - **Insurance Portal APIs** - Direct integration when available
 
@@ -119,12 +125,28 @@ npm run dev
 npm run build
 ```
 
+### **Backend API Setup**
+The patient app requires the backend API to be running:
+```bash
+# Clone the API repository
+git clone https://github.com/BoweryJG/clearverify-api.git
+cd clearverify-api
+
+# Install dependencies
+npm install
+
+# Start the API server
+npm run dev
+```
+
 ### **Environment Setup**
 Create `.env` file:
 ```env
-VITE_API_URL=https://clearverify-api.onrender.com
-VITE_MAGIC_LINK_SERVICE=https://magic-links.clearverify.com
-VITE_ENABLE_AI_LEARNING=true
+# For local development
+REACT_APP_API_URL=http://localhost:3000/api/v1
+
+# For production (set in Netlify environment variables)
+# REACT_APP_API_URL=https://clearverify-api.onrender.com/api/v1
 ```
 
 ---
@@ -237,9 +259,10 @@ src/
 │   ├── ProcedureSelect.jsx   # Procedure selection
 │   └── Results.jsx           # Verification results
 ├── services/
-│   ├── PortalLearner.js      # AI portal learning engine
-│   ├── PortalAutomator.js    # Puppeteer automation
-│   └── IntelligentVerificationService.js  # Main orchestrator
+│   ├── VerificationAPIClient.js  # API client for backend communication
+│   ├── PortalLearner.js         # AI portal learning engine (backend only)
+│   ├── PortalAutomator.js       # Puppeteer automation (backend only)
+│   └── IntelligentVerificationService.js  # Main orchestrator (backend only)
 ├── App.jsx                   # Main application
 └── main.jsx                  # Entry point
 ```
@@ -248,10 +271,11 @@ src/
 
 #### **Learning New Portals**
 ```javascript
-const verificationService = new IntelligentVerificationService();
+// Frontend API client
+const verificationClient = new VerificationAPIClient();
 
-// Automatically learns new insurers
-const result = await verificationService.verifyInsurance({
+// Automatically learns new insurers through backend
+const result = await verificationClient.verifyInsurance({
   insuranceName: "Guardian Dental",
   memberId: "GD123456789",
   groupNumber: "12345"
@@ -309,8 +333,7 @@ npm run build
 dist
 
 # Environment variables
-VITE_API_URL=https://clearverify-api.onrender.com
-VITE_MAGIC_LINK_SERVICE=https://magic-links.clearverify.com
+REACT_APP_API_URL=https://clearverify-api.onrender.com/api/v1
 ```
 
 ### **Backend Services**
