@@ -5,7 +5,7 @@ import ProcedureSelect from './components/ProcedureSelect'
 import Loading from './components/Loading'
 import Results from './components/Results'
 import ConsentModal from './components/ConsentModal'
-import IntelligentVerificationService from './services/IntelligentVerificationService'
+import VerificationAPIClient from './services/VerificationAPIClient'
 
 function App() {
   const [step, setStep] = useState('hero') // hero, scan, procedure, loading, results, consent
@@ -16,7 +16,7 @@ function App() {
   })
   const [results, setResults] = useState(null)
   const [consentData, setConsentData] = useState(null)
-  const [verificationService] = useState(() => new IntelligentVerificationService())
+  const [verificationService] = useState(() => new VerificationAPIClient())
   const [loadingMessage, setLoadingMessage] = useState('Verifying insurance...')
 
   const handleStart = () => {
