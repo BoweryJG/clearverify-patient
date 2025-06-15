@@ -7,7 +7,7 @@ const LOADING_STEPS = [
   "Almost done..."
 ]
 
-function Loading() {
+function Loading({ message = null }) {
   const [currentStep, setCurrentStep] = useState(0)
   const [progress, setProgress] = useState(0)
 
@@ -34,7 +34,7 @@ function Loading() {
       <div className="spinner"></div>
       
       <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '8px' }}>
-        {LOADING_STEPS[currentStep]}
+        {message || LOADING_STEPS[currentStep]}
       </h3>
       
       <p style={{ color: '#6b7280', marginBottom: '24px' }}>
